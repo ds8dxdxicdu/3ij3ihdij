@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Solicitud de Aplicación</title>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: #eef2f7;
+      text-align: center;
+      padding: 30px;
+    }
+
+    input, button {
+      display: block;
+      margin: 10px auto;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      width: 80%;
+      max-width: 300px;
+    }
+
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    #recargarBtn {
+      background-color: #28a745;
+    }
+
+    #recargarBtn:hover {
+      background-color: #1e7e34;
+    }
+
+    #respuesta {
+      margin-top: 20px;
+      font-weight: bold;
+      font-size: 18px;
+    }
+  </style>
+
+  <!-- Firebase SDKs -->
+  <script type="module">
+    // Import the functions you need from the SDKs
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js";
+
+    // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDEfz06c2rjYZGQW1tKDl1dLzXPubjwKDM",
+      authDomain: "mi-app-cb6a8.firebaseapp.com",
+      projectId: "mi-app-cb6a8",
+      storageBucket: "mi-app-cb6a8.firebasestorage.app",
+      messagingSenderId: "283018898289",
+      appId: "1:283018898289:web:a41bb9212ef069179724d0",
+      measurementId: "G-S94X4WQSSP"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+  </script>
+</head>
+<body>
+  <h2>📲 Solicitud para Obtener la App</h2>
+
+  <input type="text" id="nombre" placeholder="Nombre" />
+  <input type="text" id="apellido1" placeholder="Primer Apellido" />
+  <input type="text" id="apellido2" placeholder="Segundo Apellido" />
+
+  <button onclick="enviarSolicitud()">Entregar Solicitud</button>
+  <button id="recargarBtn" onclick="location.reload()">🔄 Recargar Página</button>
+
+  <p id="respuesta"></p>
+
+  <script>
+    let solicitudes = JSON.parse(localStorage.getItem("solicitudes")) || [];
+
+    function enviarSolicitud() {
+      const nombre = document.getElementById('nombre').value.trim();
+      const apellido1 = document.getElementById('apellido1').value.trim();
+      const apellido2 = document.getElementById('apellido2').value.trim();
+      const respuesta = document.getElementById('respuesta');
+
+      if (!nombre || !apellido1 || !apellido2) {
+        respuesta.textContent = "Por favor, rellena todos los campos.";
+        respuesta.style.color = "red";
+        return;
+      }
+
+      const id = `${nombre}-${apellido1}-${apellido2}`.toLowerCase();
+      const index = solicitudes.findIndex(s => s.id === id);
+
+      if (index === -1) {
+        solicitudes.push({ id, nombre, apellido1, apellido2, estado: "pendiente" });
+        localStorage.setItem("solicitudes", JSON.stringify(solicitudes));
+        respuesta.textContent = "✅ Solicitud enviada. Espera respuesta del administrador.";
+        respuesta.style.color = "green";
+        return;
+      }
+
+      const solicitud = solicitudes[index];
+      if (solicitud.estado === "aceptada") {
+        respuesta.innerHTML = `✅ Tu solicitud fue aceptada. <a href="./super_offer.apk" download>Descargar APK</a>`;
+        respuesta.style.color = "green";
+      } else if (solicitud.estado === "rechazada") {
+        respuesta.textContent = "❌ Tu solicitud fue rechazada.";
+        respuesta.style.color = "red";
+      } else {
+        respuesta.textContent = "⏳ Tu solicitud ya fue enviada y está pendiente.";
+        respuesta.style.color = "orange";
+      }
+    }
+  </script>
+</body>
+</html>
